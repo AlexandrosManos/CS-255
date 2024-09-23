@@ -1,0 +1,112 @@
+   text section:
+   0x8049db5 <readString>:      push   %ebp         # Stores (push) the value of ebp in stack
+   0x8049db6 <readString+1>:    mov    %esp,%ebp    # Moves the bottom pointer to the new base of the stack
+   0x8049db8 <readString+3>:    sub    $0x48,%esp
+   0x8049dbb <readString+6>:    movl   $0x0,-0xc(%ebp)
+   0x8049dc2 <readString+13>:   mov    0x80e3434,%eax
+   0x8049dc7 <readString+18>:   sub    $0xc,%esp
+   0x8049dca <readString+21>:   push   %eax         # Pushes the parameters to the stack
+   0x8049dcb <readString+22>:   call   0x8059530 <getc> # Call the fgetc function
+   0x8049dd0 <readString+27>:   add    $0x10,%esp
+   0x8049dd3 <readString+30>:   mov    %eax,-0x10(%ebp) # Stores the value in c variable
+   0x8049dd6 <readString+33>:   cmpl   $0xffffffff,-0x10(%ebp) # Compare c == EOF
+   0x8049dda <readString+37>:   je     0x8049df4 <readString+63> # Jump to readString+63 if the comparison was true 
+   0x8049ddc <readString+39>:   cmpl   $0xa,-0x10(%ebp)        # Compare c == \n
+   0x8049de0 <readString+43>:   je     0x8049df4 <readString+63> # Jump to readString+63 if the comparison was true
+   0x8049de2 <readString+45>:   mov    -0xc(%ebp),%eax         # Store the variable c in buf[i]
+   0x8049de5 <readString+48>:   lea    0x1(%eax),%edx          # edx <- eax + 1
+   0x8049de8 <readString+51>:   mov    %edx,-0xc(%ebp)
+   0x8049deb <readString+54>:   mov    -0x10(%ebp),%edx
+   0x8049dee <readString+57>:   mov    %dl,-0x40(%ebp,%eax,1)  # i ++
+   0x8049df2 <readString+61>:   jmp    0x8049dc2 <readString+13> # Jump to readString+13 (while(1))
+   0x8049df4 <readString+63>:   lea    -0x40(%ebp),%edx          # (Load Effective Address) buf[i] 
+   0x8049df7 <readString+66>:   mov    -0xc(%ebp),%eax
+   0x8049dfa <readString+69>:   add    %edx,%eax                 # eax <- ebx + eax
+   0x8049dfc <readString+71>:   movb   $0x0,(%eax)               # buf[i] = 0            
+   0x8049dff <readString+74>:   movl   $0x0,-0xc(%ebp)           # i = 0
+   0x8049e06 <readString+81>:   jmp    0x8049e21 <readString+108> # Jump to readString+108 (for (i = 0; i < BUFSIZE; i++))
+   0x8049e08 <readString+83>:   mov    -0xc(%ebp),%edx            
+   0x8049e0b <readString+86>:   mov    0x8(%ebp),%eax
+   0x8049e0e <readString+89>:   add    %eax,%edx                  # s[i] = buf[i];
+   0x8049e10 <readString+91>:   lea    -0x40(%ebp),%ecx
+   0x8049e13 <readString+94>:   mov    -0xc(%ebp),%eax
+   0x8049e16 <readString+97>:   add    %ecx,%eax
+   0x8049e18 <readString+99>:   movzbl (%eax),%eax
+   0x8049e1b <readString+102>:  mov    %al,(%edx)
+   0x8049e1d <readString+104>:  addl   $0x1,-0xc(%ebp)          # i++
+   0x8049e21 <readString+108>:  cmpl   $0x2f,-0xc(%ebp)         # (i - BUFSIZE)
+   0x8049e25 <readString+112>:  jle    0x8049e08 <readString+83> # Jump if previous cmpl was "<=" (BUFSIZE <= i)
+   0x8049e27 <readString+114>:  nop
+   0x8049e28 <readString+115>:  leave                       
+   0x8049e29 <readString+116>:  ret                             # return
+
+
+------------------------------------data section----------------------------------------------
+
+(gdb) print &grade:
+   1 = 0x80e3068 <grade> "3"
+(gdb) print grade
+   2 = 51 '3'
+
+  variable->grade: value '3' (char) and address  0x80e3068 
+
+-------------------------------------bss section----------------------------------------------
+
+(gdb) print &Name:
+   3 = (char (*)[48]) 0x80e42e0 <Name>
+
+bss-> Name char array size of 48. The first element of the array is n address 0x80e42e0.
+
+
+----------------------------------stack-frame ------------------------------------------------
+    (gdb) print $esp
+    $1 = (void *) 0xbffff460
+    (gdb) print $ebp
+    $2 = (void *) 0xbffff4a8
+
+    (gdb) print &c
+    $2 = (int *) 0xbffff498
+    (gdb) print &i
+    $5 = (int *) 0xbffff49c
+    (gdb) print &buf
+    $3 = (char (*)[48]) 0xbffff468
+    
+
+(gdb) x/68b $esp
+0xbffff460:     0xc0    0x31    0x0e    0x08    0x12    0x00    0x00    0x00
+0xbffff468:     0xa8    0xf4    0xff    0xbf    0xce    0x75    0x05    0x08
+0xbffff470:     0xc0    0x31    0x0e    0x08    0x0a    0x00    0x00    0x00
+0xbffff478:     0x12    0x00    0x00    0x00    0x00    0x00    0x60    0x00
+0xbffff480:     0x74    0xc4    0x0c    0x08    0x54    0x03    0x00    0x00
+0xbffff488:     0x00    0x30    0x0e    0x08    0x30    0x34    0x0e    0x08
+0xbffff490:     0x01    0x00    0x00    0x00    0x84    0xf5    0xff    0xbf
+0xbffff498:     0x8b    0x74    0x05    0x08    0x00    0x30    0x0e    0x08
+0xbffff4a0:     0x00    0x30    0x0e    0x0
+
+
+		                    
+%esp:           0xbffff460   
+
+buf :           0xbffff468    
+				           
+c:              0xbffff498             
+				       	  
+i:              0xbffff49c         
+				           
+%ebp:           0xbffff4a8     
+
+return address: 0xbffff4ac
+
+-----------------------------Extras data 6-----------------------------------------------------
+0x8049e8e <main+100>:        movb   $0x36,0x80e3068 -> grade = 6
+
+-----------------------------Extras data 9-----------------------------------------------------
+0x8049e6d <main+67>: call   0x8049db5 <readString>
+0x8049e72 <main+72>: add    $0x10,%esp
+
+movb -> c6 05 
+mov -> b8
+jmp -> ff
+%eax -> e0
+9 = 39 -> ascii table
+
